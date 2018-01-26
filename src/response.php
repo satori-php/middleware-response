@@ -28,6 +28,7 @@ const MONTH = 60 * 60 * 24 * 30;
  *      ```
  *      [
  *          'cookie_lifetime' => 'cookie.lifetime',
+ *          'cookie_path' => 'cookie.path',
  *          'cookie_domain' => 'domain.admin',
  *          'cookie_secure' => 'cookie.secure',
  *          'cookie_httponly' => 'cookie.httponly'
@@ -41,6 +42,7 @@ function init(ApplicationInterface $app, string $id, array $names)
         $app->notify('start_response');
         $capsule = yield;
         $defaultLifetime = $app[$names['cookie_lifetime'] ?? ''] ?? MONTH;
+        $defaultPath = $app[$names['cookie_path'] ?? ''] ?? '/';
         $defaultDomain = $app[$names['cookie_domain'] ?? ''] ?? '';
         $defaulSecure = $app[$names['cookie_secure'] ?? ''] ?? false;
         $defaulHttponly = $app[$names['cookie_httponly'] ?? ''] ?? true;
@@ -48,7 +50,7 @@ function init(ApplicationInterface $app, string $id, array $names)
         Response\sendHeaders($capsule['http.headers']);
         foreach ($capsule['cookies'] ?? [] as $name => $params) {
             $lifetime = ($params['lifetime'] ?? $defaultLifetime) + time();
-            $path = $params['path'] ?? '/';
+            $path = $params['path'] ?? $defaultPath;
             $domain = $params['domain'] ?? $defaultDomain;
             $secure = $params['secure'] ?? $defaulSecure;
             $httponly = $params['httponly'] ?? $defaulHttponly;
